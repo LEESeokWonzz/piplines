@@ -2,40 +2,35 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "yourdockerhubusername/your-app"
-        K8S_DEPLOYMENT = "your-app-deployment"
-        K8S_NAMESPACE = "default"
+        REPO_URL = 'https://github.com/your-org/your-repo.git'
+        BRANCH = 'main'
+        SSH_USER = 'ubuntu'
+        SSH_HOST = 'your.iaas.server.ip'
+        SSH_TARGET_DIR = '/home/ubuntu/app'
     }
 
     stages {
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/yourname/your-repo.git'
+                git branch: "${BRANCH}", url: "${REPO_URL}"
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build Application') {
             steps {
-                sh 'docker build -t $IMAGE_NAME .'
+                sh '''
+                echo "Build Application"
+                ./gradlew build
+                '''
             }
         }
 
-        stage('Push to Docker Hub') {
+        stage('Deploy to IaaS') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh '''
-                      echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                      docker push $IMAGE_NAME
-                    '''
-                }
-            }
-        }
-
-        stage('Deploy to Kubernetes') {
-            steps {
-                sh """
-                  kubectl set image deployment/$K8S_DEPLOYMENT your-container-name=$IMAGE_NAME -n $K8S_NAMESPACE
-                """
+                sh '''
+                echo "IaaS 서버로 결과물 전송 중..."
+                scp build/libs/*.jar ${SSH_USER}@${SSH_HOST}:${SSH_TARGET_DIR}/
+                '''
             }
         }
     }
