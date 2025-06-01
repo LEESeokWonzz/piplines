@@ -33,7 +33,7 @@ pipeline {
             }
         }
 
-        stage('Push to Registry') {
+        stage('Push to Registry and run') {
             steps {
                 withCredentials([usernamePassword(credentialsId: env.REGISTRY_CREDENTIALS_ID, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                     sh '''
@@ -42,8 +42,11 @@ pipeline {
                     '''
 
                     sh '''
-                    sleep 100
-                    docker run -d --name project-resume -p 30000:8080 $IMAGE_NAME:$IMAGE_TAG
+                    sleep 3
+                        docker pull $IMAGE_NAME:$IMAGE_TAG
+                        docker stop project-resume || true
+                        docker rm project-resume || true
+                        docker run -d --name project-resume -p 30000:8080 $IMAGE_NAME:$IMAGE_TAG
                     '''
                 }
             }
