@@ -6,7 +6,7 @@ pipeline {
         BRANCH = "${params.TARGET_BRANCH}"
         IMAGE_NAME = 'yesman0914/01'
         IMAGE_TAG = 'latest'
-        REGISTRY_CREDENTIALS_ID = 'docker-id'
+        REGISTRY_CREDENTIALS_ID = 'yesman0914'
     }
 
     tools {
