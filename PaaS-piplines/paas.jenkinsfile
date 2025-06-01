@@ -18,6 +18,7 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 git branch: "${BRANCH}", url: "${REPO_URL}"
+                sh 'docker --version'
             }
         }
 
