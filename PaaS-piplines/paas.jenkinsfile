@@ -51,24 +51,5 @@ pipeline {
                 }
             }
         }
-
-        // stage('Deploy to Remote (Optional)') {
-        //     steps {
-        //         sshPublisher(
-        //             publishers: [
-        //                 sshPublisherDesc(
-        //                     configName: 'app-server',
-        //                     transfers: [],
-        //                     execCommand: '''
-        //                         docker pull $IMAGE_NAME:$IMAGE_TAG
-        //                         docker stop project-resume || true
-        //                         docker rm project-resume || true
-        //                         docker run -d --name project-resume -p 8080:8080 $IMAGE_NAME:$IMAGE_TAG
-        //                     '''
-        //                 )
-        //             ]
-        //         )
-        //     }
-        // }
     }
 }
