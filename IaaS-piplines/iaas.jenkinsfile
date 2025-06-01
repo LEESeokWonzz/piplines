@@ -1,14 +1,14 @@
 pipeline {
     agent any
 
-    parameters {
-        string(name: 'REPO_URL')
-        string(name: 'BRANCH', defaultValue: 'dev')
-    }
+    // parameters {
+    //     string(name: 'REPO_URL')
+    //     string(name: 'BRANCH', defaultValue: 'dev')
+    // }
 
     environment {
-        REPO_URL =${env.APP_REPO}
-        BRANCH = ${env.TARGET_BRANCH}
+        REPO_URL =${params.APP_REPO}
+        BRANCH = ${params.TARGET_BRANCH}
         SSH_USER = 'ubuntu'
         SSH_HOST = 'your.iaas.server.ip'
         SSH_TARGET_DIR = '/home/ubuntu/app'
