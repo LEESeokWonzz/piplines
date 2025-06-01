@@ -7,7 +7,7 @@ pipeline {
         MAVEN_IMAGE = 'maven:3.8.5-eclipse-temurin-17'
         MAVEN_OPTS = '-Dmaven.repo.local=.m2/repository'
         SSH_HOST = "${params.SERVER}"
-        SSH_TARGET_DIR = "${params.SERVER}"
+        SSH_TARGET_DIR = "${params.REMOTE_DIRECTORY}"
     }
     tools {
         maven 'maven'       
@@ -51,7 +51,7 @@ pipeline {
                                 remoteDirectory: "${SSH_TARGET_DIR}",  // 원격 서버 경로
                                 removePrefix: 'target',            // target 폴더 이름 제거해서 복사
                                 cleanRemote: false,
-                                 execCommand:  'sh ./app-server/deploy.sh'
+                                 execCommand: 'sh ./deploy.sh'
 
                             )
                         ],
