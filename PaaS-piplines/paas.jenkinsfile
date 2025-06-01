@@ -28,8 +28,8 @@ pipeline {
         }
 
         stage('Build Docker Image') {
-            steps {
-                docker.build("$IMAGE_NAME:$IMAGE_TAG")
+            steps { 
+                app = docker.build("yesman0914/01")
                 // sh 'docker build -t $IMAGE_NAME:$IMAGE_TAG .'
             }
         }
@@ -37,10 +37,8 @@ pipeline {
         stage('Push to Registry') {
             steps {
                 withCredentials([usernamePassword(credentialsId: env.REGISTRY_CREDENTIALS_ID, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    sh '''
-                        echo "$PASSWORD" | docker login -u "$USERNAME" --password-stdin
-                        docker push $IMAGE_NAME:$IMAGE_TAG
-                    '''
+                    app.push("${env.BUILD_NUMBER}")
+                    app.push("latest")
                 }
             }
         }
