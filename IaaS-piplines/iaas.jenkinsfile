@@ -51,7 +51,7 @@ pipeline {
                                 remoteDirectory: "${SSH_TARGET_DIR}",  // 원격 서버 경로
                                 removePrefix: 'target',            // target 폴더 이름 제거해서 복사
                                 cleanRemote: false,
-                                 execCommand: 'sh ./deploy.sh'
+                                 execCommand: 'sh deploy.sh'
 
                             )
                         ],
