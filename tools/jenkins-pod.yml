@@ -1,0 +1,18 @@
+# jenkins-pod.yaml (단일 Pod로 예시)
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jenkins
+spec:
+  containers:
+    - name: jenkins
+      image: jenkins/jenkins:lts
+      ports:
+        - containerPort: 8080
+      volumeMounts:
+        - name: jenkins-storage
+          mountPath: /var/jenkins_home
+  volumes:
+    - name: jenkins-storage
+      persistentVolumeClaim:
+        claimName: jenkins-pvc
