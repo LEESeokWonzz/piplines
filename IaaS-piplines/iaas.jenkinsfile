@@ -23,11 +23,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                script {
-                    docker.image(env.MAVEN_IMAGE).inside {
-                        sh 'mvn clean package -DskipTests'
-                    }
-                }
+                sh 'mvn clean package'
             }
         }
         
