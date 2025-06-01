@@ -35,9 +35,30 @@ pipeline {
             steps {
                 sh '''
                     mvn clean package
+                    cat target/*.jar
                 '''
             }
         }
         
+        stage('Deploy') {
+            steps {
+                sshPublisher(publishers: [
+                    sshPublisherDesc(
+                        configName: 'app-server', // Jenkins에 등록한 서버 이름
+                        transfers: [
+                            sshTransfer(
+                                sourceFiles: 'target/*.jar',      // 빌드된 jar 파일 경로
+                                remoteDirectory: 'app',  // 원격 서버 경로
+                                removePrefix: 'target',            // target 폴더 이름 제거해서 복사
+                                cleanRemote: false
+                            )
+                        ],
+                        usePromotionTimestamp: false,
+                        verbose: true
+                    )
+                ])
+            }
+        }
+
     }
 }
