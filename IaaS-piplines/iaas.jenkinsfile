@@ -1,9 +1,14 @@
 pipeline {
     agent any
 
+    parameters {
+        string(name: 'REPO_URL')
+        string(name: 'BRANCH', defaultValue: 'dev')
+    }
+
     environment {
-        REPO_URL = 'https://github.com/your-org/your-repo.git'
-        BRANCH = 'main'
+        REPO_URL =${env.APP_REPO}
+        BRANCH = ${env.TARGET_BRANCH}
         SSH_USER = 'ubuntu'
         SSH_HOST = 'your.iaas.server.ip'
         SSH_TARGET_DIR = '/home/ubuntu/app'
@@ -21,6 +26,9 @@ pipeline {
                 sh '''
                 echo "Build Application"
                 ./gradlew build
+
+                pwd        
+                ls -ltr build/libs
                 '''
             }
         }
@@ -28,9 +36,13 @@ pipeline {
         stage('Deploy to IaaS') {
             steps {
                 sh '''
-                echo "IaaS 서버로 결과물 전송 중..."
-                scp build/libs/*.jar ${SSH_USER}@${SSH_HOST}:${SSH_TARGET_DIR}/
+                echo "Deploy to IaaS"
                 '''
+
+                // sh '''
+                // echo "Deploy to IaaS"
+                // // scp build/libs/*.jar ${SSH_USER}@${SSH_HOST}:${SSH_TARGET_DIR}/
+                // '''
             }
         }
     }
