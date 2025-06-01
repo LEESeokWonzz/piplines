@@ -29,7 +29,8 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh '/usr/bin/docker build -t my-image:latest .'
+                docker.build("$IMAGE_NAME:$IMAGE_TAG")
+                // sh 'docker build -t $IMAGE_NAME:$IMAGE_TAG .'
             }
         }
 
