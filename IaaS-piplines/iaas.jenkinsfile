@@ -7,8 +7,8 @@ pipeline {
     // }
 
     environment {
-        REPO_URL =params.APP_REPO
-        BRANCH = params.TARGET_BRANCH
+        REPO_URL = "${params.APP_REPO}"
+        BRANCH = "${params.TARGET_BRANCH}"
         SSH_USER = 'ubuntu'
         SSH_HOST = 'your.iaas.server.ip'
         SSH_TARGET_DIR = '/home/ubuntu/app'
