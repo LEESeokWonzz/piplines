@@ -25,8 +25,8 @@ pipeline {
             steps {
                 sh '''
                 echo "Build Application"
-                ./gradlew build
-
+                ./mvn clean package
+                
                 pwd        
                 ls -ltr build/libs
                 '''
