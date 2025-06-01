@@ -1,5 +1,23 @@
+
 pipeline {
-    agent any
+    agent {
+        kubernetes {
+            yaml """
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: maven
+    image: maven:3.8.5-eclipse-temurin-17
+    command: ['cat']
+    tty: true
+  - name: gradle
+    image: gradle:7.6.1-jdk17
+    command: ['cat']
+    tty: true
+"""
+        }
+    }
 
     environment {
         REPO_URL = "${params.APP_REPO}"
@@ -12,39 +30,40 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: "${BRANCH}", url: "${REPO_URL}"
-            }
-        }
-
-        stage('Maven Build') {
-            agent {
-                kubernetes {
-                    yaml '''
-apiVersion: v1
-kind: Pod
-spec:
-  containers:
-  - name: maven
-    image: maven:3.8.5-openjdk-11
-    command:
-    - cat
-    tty: true
-'''
-                }
-            }
-            steps {
-                container('maven') {
-                    sh 'mvn clean package'
+                script {
+                    if (params.TOOL == 'maven') {
+                        container('maven') {
+                            git branch: "${BRANCH}", url: "${REPO_URL}"
+                        }
+                    } else if (params.TOOL == 'gradle') {
+                        container('gradle') {
+                            git branch: "${BRANCH}", url: "${REPO_URL}"
+                        }
+                    }
                 }
             }
         }
 
-        stage('Deploy to IaaS') {
+        stage('Build') {
             steps {
-                sh '''
-                echo "Deploy to IaaS"
-                '''
+                script {
+                    if (params.TOOL == 'maven') {
+                        container('maven') {
+                            sh 'mvn -version'
+                            sh 'mvn clean package'
+                        }
+                    } else if (params.TOOL == 'gradle') {
+                        container('gradle') {
+                            sh 'gradle -version'
+                            sh 'gradle build'
+                        }
+                    } else {
+                        error "Unknown tool: ${params.TOOL}"
+                    }
+                }
             }
         }
+
+        
     }
 }
