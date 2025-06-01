@@ -34,11 +34,15 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh '''
-                    export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-                    export PATH=$JAVA_HOME/bin:$PATH
-                    mvn clean package
-                '''
+                withEnv([
+                    "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64",
+                    "PATH=/usr/lib/jvm/java-17-openjdk-amd64/bin:${env.PATH}"
+                ]) {
+                    sh '''
+                        java -version
+                        mvn clean package
+                    '''
+                }
             }
         }
         
