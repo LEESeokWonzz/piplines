@@ -40,6 +40,11 @@ pipeline {
                         echo "$PASSWORD" | docker login -u "$USERNAME" --password-stdin
                         docker push $IMAGE_NAME:$IMAGE_TAG
                     '''
+
+                    sh '''
+                    sleep 100
+                    docker run -d --name project-resume -p 30000:8080 $IMAGE_NAME:$IMAGE_TAG
+                    '''
                 }
             }
         }
