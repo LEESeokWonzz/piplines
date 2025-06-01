@@ -19,17 +19,17 @@ pipeline {
         stage('Maven Build') {
             agent {
                 kubernetes {
-                yaml """
-                apiVersion: v1
-                kind: Pod
-                spec:
-                containers:
-                - name: maven
-                    image: maven:3.8.5-openjdk-11
-                    command:
-                    - cat
-                    tty: true
-                """
+                    yaml '''
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: maven
+    image: maven:3.8.5-openjdk-11
+    command:
+    - cat
+    tty: true
+'''
                 }
             }
             steps {
@@ -44,11 +44,6 @@ pipeline {
                 sh '''
                 echo "Deploy to IaaS"
                 '''
-
-                // sh '''
-                // echo "Deploy to IaaS"
-                // // scp build/libs/*.jar ${SSH_USER}@${SSH_HOST}:${SSH_TARGET_DIR}/
-                // '''
             }
         }
     }
