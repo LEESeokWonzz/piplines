@@ -6,8 +6,8 @@ pipeline {
         BRANCH = "${params.TARGET_BRANCH}"
         MAVEN_IMAGE = 'maven:3.8.5-eclipse-temurin-17'
         MAVEN_OPTS = '-Dmaven.repo.local=.m2/repository'
-        SSH_HOST = 'your.iaas.server.ip'
-        SSH_TARGET_DIR = '/home/ubuntu/app'
+        SSH_HOST = "${params.SERVER}"
+        SSH_TARGET_DIR = "${params.SERVER}"
     }
     tools {
         maven 'maven'       
@@ -35,7 +35,7 @@ pipeline {
             steps {
                 sh '''
                     mvn clean package
-                    cat target/*.jar
+                    ls -ltr target/*.jar
                 '''
             }
         }
@@ -44,13 +44,17 @@ pipeline {
             steps {
                 sshPublisher(publishers: [
                     sshPublisherDesc(
-                        configName: 'app-server', // Jenkins에 등록한 서버 이름
+                        configName: "${SSH_HOST}", // Jenkins에 등록한 서버 이름
                         transfers: [
                             sshTransfer(
                                 sourceFiles: 'target/*.jar',      // 빌드된 jar 파일 경로
-                                remoteDirectory: 'app',  // 원격 서버 경로
+                                remoteDirectory: "${SSH_TARGET_DIR}",  // 원격 서버 경로
                                 removePrefix: 'target',            // target 폴더 이름 제거해서 복사
-                                cleanRemote: false
+                                cleanRemote: false,
+                                 execCommand: '''
+                                    pkill -f project-resume-0.0.1-SNAPSHOT.jar || true
+                                    nohup java -jar ./project-resume-0.0.1-SNAPSHOT.jar
+                                 '''
                             )
                         ],
                         usePromotionTimestamp: false,
