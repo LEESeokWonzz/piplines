@@ -10,8 +10,7 @@ pipeline {
         SSH_TARGET_DIR = '/home/ubuntu/app'
     }
     tools {
-        maven 'maven'
-        jdk 'JDK17'          
+        maven 'maven'       
     }
 
     stages {
@@ -22,27 +21,21 @@ pipeline {
         }
 
         stage('Check Env') {
-            steps {
-                sh '''
-                    echo "JAVA_HOME=$JAVA_HOME"
-                    which java
-                    java -version
-                    echo "PATH=$PATH"
-                '''
-            }
+        steps {
+            sh '''
+                echo "JAVA_HOME=$JAVA_HOME"
+                which java
+                java -version
+                echo "PATH=$PATH"
+            '''
         }
+    }
 
         stage('Build') {
             steps {
-                withEnv([
-                    "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64",
-                    "PATH=/usr/lib/jvm/java-17-openjdk-amd64/bin:${env.PATH}"
-                ]) {
-                    sh '''
-                        java -version
-                        mvn clean package
-                    '''
-                }
+                sh '''
+                    mvn clean package
+                '''
             }
         }
         
