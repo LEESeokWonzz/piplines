@@ -1,28 +1,11 @@
 
 pipeline {
-    agent {
-        kubernetes {
-            yaml """
-apiVersion: v1
-kind: Pod
-spec:
-  containers:
-  - name: maven
-    image: maven:3.8.5-eclipse-temurin-17
-    command: ['cat']
-    tty: true
-  - name: gradle
-    image: gradle:7.6.1-jdk17
-    command: ['cat']
-    tty: true
-"""
-        }
-    }
-
+    agent any
     environment {
         REPO_URL = "${params.APP_REPO}"
         BRANCH = "${params.TARGET_BRANCH}"
-        SSH_USER = 'ubuntu'
+        MAVEN_IMAGE = 'maven:3.8.5-eclipse-temurin-17'
+        MAVEN_OPTS = '-Dmaven.repo.local=.m2/repository'
         SSH_HOST = 'your.iaas.server.ip'
         SSH_TARGET_DIR = '/home/ubuntu/app'
     }
@@ -30,40 +13,19 @@ spec:
     stages {
         stage('Clone Repository') {
             steps {
-                script {
-                    if (params.TOOL == 'maven') {
-                        container('maven') {
-                            git branch: "${BRANCH}", url: "${REPO_URL}"
-                        }
-                    } else if (params.TOOL == 'gradle') {
-                        container('gradle') {
-                            git branch: "${BRANCH}", url: "${REPO_URL}"
-                        }
-                    }
-                }
+                git branch: "${BRANCH}", url: "${REPO_URL}"
             }
         }
 
         stage('Build') {
             steps {
                 script {
-                    if (params.TOOL == 'maven') {
-                        container('maven') {
-                            sh 'mvn -version'
-                            sh 'mvn clean package'
-                        }
-                    } else if (params.TOOL == 'gradle') {
-                        container('gradle') {
-                            sh 'gradle -version'
-                            sh 'gradle build'
-                        }
-                    } else {
-                        error "Unknown tool: ${params.TOOL}"
+                    docker.image(env.MAVEN_IMAGE).inside {
+                        sh 'mvn clean package -DskipTests'
                     }
                 }
             }
         }
-
         
     }
 }
