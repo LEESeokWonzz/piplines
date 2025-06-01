@@ -9,6 +9,10 @@ pipeline {
         SSH_HOST = 'your.iaas.server.ip'
         SSH_TARGET_DIR = '/home/ubuntu/app'
     }
+    tools {
+        maven 'maven'
+        jdk 'JDK9'          
+    }
 
     stages {
         stage('Clone Repository') {
