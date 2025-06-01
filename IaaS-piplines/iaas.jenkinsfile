@@ -24,8 +24,9 @@ pipeline {
         stage('Build') {
             steps {
                 sh '''
-                echo $JAVA_HOME
-                mvn clean package
+                    export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+                    export PATH=$JAVA_HOME/bin:$PATH
+                    mvn clean package
                 '''
             }
         }
