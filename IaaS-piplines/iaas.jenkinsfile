@@ -1,11 +1,6 @@
 pipeline {
     agent any
 
-    // parameters {
-    //     string(name: 'REPO_URL')
-    //     string(name: 'BRANCH', defaultValue: 'dev')
-    // }
-
     environment {
         REPO_URL = "${params.APP_REPO}"
         BRANCH = "${params.TARGET_BRANCH}"
@@ -21,15 +16,24 @@ pipeline {
             }
         }
 
-        stage('Build Application') {
+        stage('Maven Build') {
+            agent {
+                kubernetes {
+                yaml """
+                apiVersion: v1
+                kind: Pod
+                spec:
+                    containers:
+                    - name: maven
+                    image: maven:3.8.5-jdk-11
+                    command:
+                    - cat
+                    tty: true
+                """
+                }
+            }
             steps {
-                sh '''
-                echo "Build Application"
-                ./mvn clean package
-                
-                pwd        
-                ls -ltr build/libs
-                '''
+                sh 'mvn clean package'
             }
         }
 
